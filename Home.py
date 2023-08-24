@@ -8,8 +8,10 @@ st.title("ESG Report Generation")
 # Sidebar Configuration
 st.sidebar.header("Search Parameters")
 orgString = st.sidebar.text_input("Organisation", placeholder="Example & Sons")
-startDate = st.sidebar.date_input("Start Year", help="The starting year for the report data")
-endDate = st.sidebar.date_input("End Year", help="The closing year for the report data")
+startDate = st.sidebar.date_input(
+    "Start Year", help="The starting year for the report data")
+endDate = st.sidebar.date_input(
+    "End Year", help="The closing year for the report data")
 PSID = st.sidebar.text_input("Secure1_PSID Cookie", type="password")
 PSIDTS = st.sidebar.text_input("Secure1_PSIDTS Cookie", type="password")
 
@@ -22,4 +24,3 @@ queryString = "Write an ESG report for the company {} based on data from {} to {
 st.header("Search Query")
 st.subheader("Your search query looks like this:")
 st.write(queryString.format(orgString, startDate.year, endDate.year))
-
