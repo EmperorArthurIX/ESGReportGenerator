@@ -1,31 +1,34 @@
-from bardapi import Bard, BardCookies
-
+from bardapi import BardCookies
+import streamlit as st
 
 class BardAPIConsumer:
 
-    def __init__(self, PSID: str, PSIDTS: str):
-        self.PSID = PSID
-        self.PSIDTS = PSIDTS
+    def __init__(_self, PSID: str, PSIDTS: str):
+        _self.PSID = PSID
+        _self.PSIDTS = PSIDTS
         cookie_dict = {
             "__Secure-1PSID": PSID,
             "__Secure-1PSIDTS": PSIDTS,
             # Any cookie values you want to pass session object.
         }
-        self.bard = BardCookies(cookie_dict=cookie_dict)
+        _self.bard = BardCookies(cookie_dict=cookie_dict)
 
-    def get_report_text(self, queryString) -> str:
-        report = self.bard.get_answer(queryString)['content']
+    @st.cache_resource()
+    def get_report_text(_self, queryString) -> str:
+        report = _self.bard.get_answer(queryString)['content']
         return report
 
-    def export_word(self, reportText: str):
+    def export_word(_self, reportText: str):
         from docx import Document
         from docx.shared import Pt, RGBColor
+        import io
+        bio = io.BytesIO()
         value = reportText
         doc = Document()
 
         # Define styles for headings and paragraphs
         # 1 corresponds to paragraph style
-        heading_style = doc.styles.add_style('HeadingStyle', 1)
+        heading_style = doc.styles.add_style('Heading Style', 1)
         heading_font = heading_style.font
         heading_font.bold = True
         heading_font.size = Pt(16)
@@ -33,7 +36,7 @@ class BardAPIConsumer:
         heading_font.color.rgb = RGBColor(51, 51, 51)
 
         # 1 corresponds to paragraph style
-        body_style = doc.styles.add_style('BodyStyle', 1)
+        body_style = doc.styles.add_style('Body Style', 1)
         body_style.paragraph_format.alignment = 3  # Justify alignment
 
         # Process sections and add them to the document
@@ -44,27 +47,34 @@ class BardAPIConsumer:
 
             if heading_text and content_text:
                 # Add heading
-                heading = doc.add_paragraph(heading_text, style='HeadingStyle')
+                heading = doc.add_paragraph(heading_text, style='Heading Style')
 
                 # Add content with bullet points
                 content_lines = content_text.split('\n')
                 for line in content_lines:
                     if line.strip().startswith('* '):
                         bullet_item = doc.add_paragraph(
-                            line.strip()[2:], style='BodyStyle').style = 'ListBullet'
+                            line.strip()[2:], style='Body Style').style = 'List Bullet'
                     else:
-                        doc.add_paragraph(line.strip(), style='BodyStyle')
+                        doc.add_paragraph(line.strip(), style='Body Style')
 
         # Save the document
-        doc.save('report.docx')
+        doc.save(bio)
+        return bio
         # pass
 
-    def image_desc(self):
+    def image_desc(_self):
         pass
 
-    def refresh_cookies(self, PSID, PSIDTS):
-        self.PSID = PSID
-        self.PSIDTS = PSIDTS
+    def refresh_cookies(_self, PSID, PSIDTS):
+        _self.PSID = PSID
+        _self.PSIDTS = PSIDTS
+        cookie_dict = {
+            "__Secure-1PSID": PSID,
+            "__Secure-1PSIDTS": PSIDTS,
+            # Any cookie values you want to pass session object.
+        }
+        _self.bard = BardCookies(cookie_dict=cookie_dict)
 
 
 if __name__ == '__main__':
