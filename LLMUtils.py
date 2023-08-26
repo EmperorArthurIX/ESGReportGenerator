@@ -75,8 +75,8 @@ class BardAPIConsumer:
         img_bio = io.BytesIO()
         img_bio.write(img_bio.read())
         img_bio.seek(0)
-        res = _self.bard.ask_about_image(
-            'Generate a python dictionary from the content of the image', image)['content']
+        # res = _self.bard.ask_about_image(
+            # 'Generate a python dictionary from the content of the image', image)['content']
         return res
         # pass
 
