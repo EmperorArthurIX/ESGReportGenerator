@@ -71,14 +71,14 @@ class BardAPIConsumer:
         # image = open('image_path', 'rb').read()
         # res = _self.bard.ask_about_image('Generate a python dictionary from the content of the image', image)['content']
         # return res
-        import io
-        img_bio = io.BytesIO()
-        img_bio.write(img_bio.read())
-        img_bio.seek(0)
+        # import io
+        # img_bio = io.BytesIO()
+        # img_bio.write(img_bio.read())
+        # img_bio.seek(0)
         # res = _self.bard.ask_about_image(
             # 'Generate a python dictionary from the content of the image', image)['content']
-        return res
-        # pass
+        # return res
+        pass
 
     def refresh_cookies(_self, PSID, PSIDTS):
         _self.PSID = PSID
