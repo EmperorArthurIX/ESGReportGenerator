@@ -80,15 +80,6 @@ class BardAPIConsumer:
         # return res
         pass
 
-    def get_viz_data(_self):
-        response = _self.bard.get_answer('''Please generate a semicolon-separated string of values showing Starbucks ESG data in the following manner:
-"""year; greenhouse emissions (units); water usage (units); waste production (units)
-<year1>; <int(value1)>; <int(value1)>; <int(value1)>
-<year2>; <int(value2)>; <int(value2)>; <int(value2)>
-"""
-from 2018 to 2023''')
-        return response['content']
-
     def refresh_cookies(_self, PSID, PSIDTS):
         _self.PSID = PSID
         _self.PSIDTS = PSIDTS
@@ -99,7 +90,7 @@ from 2018 to 2023''')
         }
         _self.bard = BardCookies(cookie_dict=cookie_dict)
 
-    #  Function Creating CSV Data
+    # Function Creating CSV Data
     # @st.cache_resource()
     def create_csv(_self, orgQuery, startYear, endYear):
         query = '''Please generate a csv report showing {} ESG data in the following manner:
