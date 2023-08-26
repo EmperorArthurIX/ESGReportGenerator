@@ -68,17 +68,8 @@ class BardAPIConsumer:
         # pass
 
     def image_desc(_self, img_bio):
-        # image = open('image_path', 'rb').read()
-        # res = _self.bard.ask_about_image('Generate a python dictionary from the content of the image', image)['content']
-        # return res
-        # import io
-        # img_bio = io.BytesIO()
-        # img_bio.write(img_bio.read())
-        # img_bio.seek(0)
-        # res = _self.bard.ask_about_image(
-            # 'Generate a python dictionary from the content of the image', image)['content']
-        # return res
-        pass
+        res = _self.bard.ask_about_image('Generate a python dictionary from the content of the image', img_bio)
+        return res
 
     def refresh_cookies(_self, PSID, PSIDTS):
         _self.PSID = PSID
@@ -94,23 +85,23 @@ class BardAPIConsumer:
     # @st.cache_resource()
     def create_csv(_self, orgQuery, startYear, endYear):
         query = '''Please generate a csv report showing {} ESG data in the following manner:
-                                    """year;greenhouse_emissions(units);water_usage(units);waste_production(units)
-                                        <year1>;<int(value1)>;<int(value1)>;<int(value1)> 
-                                        <year2>;<int(value2)>;<int(value2)>;<int(value2)>
+                                    """year,greenhouse_emissions(tonnes),water_usage(litres),waste_production(tonnes)
+                                        <year1>,<int(value1)>,<int(value1)>,<int(value1)> 
+                                        <year2>,<int(value2)>,<int(value2)>,<int(value2)>
                                         """from {} to {}'''
         res = _self.bard.get_answer(query.format(
             orgQuery, startYear, endYear))['code']
         with open("response.csv", "w+") as file:
             file.write(res)
             # print("CSV Response File Generated")
-        return res
+        return res.replace("\n", "\n\n")
 
     # @st.cache_resource()
     def create_html(_self, orgQuery, startYear, endYear):
         query = '''Please generate a html report showing {} ESG data in the following strictly this manner:
-                                    """year;greenhouse_emissions(units);water_usage(units);waste_production(units)
-                                        <year1>;<int(value1)>;<int(value1)>;<int(value1)> 
-                                        <year2>;<int(value2)>;<int(value2)>;<int(value2)>
+                                    """year,greenhouse_emissions(tonnes),water_usage(litres),waste_production(tonnes)
+                                        <year1>,<int(value1)>,<int(value1)>,<int(value1)> 
+                                        <year2>,<int(value2)>,<int(value2)>,<int(value2)>
                                         """from {} to {}'''
         res_html = _self.bard.get_answer(query.format(
             orgQuery, startYear, endYear))['code']
@@ -118,13 +109,13 @@ class BardAPIConsumer:
         with open("response.html", "w+") as file:
             file.write(res_html)
             # print("HTML Response File Generated")
-        return res_html
+        return res_html.replace(">",">\n\n")
 
     # Function Creating Plot on CSV Data; Headers to be provided
     def create_plot_html(_self, data):
         # import html data to pandas and create a bar plot
         # import pandas as pd
-        # since read_html returns a list, we convert to a DataFrame
+        # since read_html returns a list, we convert to a DataFrame\
         df = pd.DataFrame(pd.read_html(data)[0])
         y_axis = list()
         for val in df.iloc[:, 1:]:

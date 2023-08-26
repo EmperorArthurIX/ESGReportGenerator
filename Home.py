@@ -23,10 +23,8 @@ PSID = st.sidebar.text_input("Secure1_PSID Cookie", type="password")
 PSIDTS = st.sidebar.text_input("Secure1_PSIDTS Cookie", type="password")
 generate_doc = st.sidebar.button(label="Generate Document")
 # download_doc = st.sidebar.button(label = "Download Generated Document")
-refresh_cookie_btn = st.sidebar.button(
-    label="Refresh Cookies", help="If you run into errors, try refreshing Bard and copy-paste the new cookies here")
-upload_image = st.sidebar.file_uploader(label="Upload Image", type=[
-    "png", "jpg"], accept_multiple_files=False)
+refresh_cookie_btn = st.sidebar.button(label="Refresh Cookies", help="If you run into errors, try refreshing Bard and copy-paste the new cookies here")
+upload_image = st.sidebar.file_uploader(label="Upload Image", type=["png", "jpg"], accept_multiple_files=False)
 
 
 # Variables
@@ -42,7 +40,7 @@ st.write(queryString.format(orgString, startDate.year, endDate.year))
 
 
 if orgString and startDate and endDate and PSID and PSIDTS:
-    try:
+    # try:
         from LLMUtils import BardAPIConsumer
         llm = BardAPIConsumer(PSID=PSID, PSIDTS=PSIDTS)
         st.write(llm.get_report_text(queryString.format(
@@ -59,11 +57,8 @@ if orgString and startDate and endDate and PSID and PSIDTS:
 
         # Function to read Image Value
 
-        # if upload_image is not None:
-        #     byte = upload_image.getvalue()
-        #     # TODO: Error 1
-        #     img_Byte = llm.image_desc(byte)
-        #      st.write(img_Byte)
+        if upload_image is not None:
+            st.write(llm.image_desc(upload_image.getvalue()))
 
         # Write for Creating CSv data and Returing plot
 
@@ -81,7 +76,7 @@ if orgString and startDate and endDate and PSID and PSIDTS:
 
 
 
-    except Exception as exp:
-        st.warning(exp)
-        st.warning(
-            "Please try refreshing cookies or try later if it doesn't work")
+    # except Exception as exp:
+    #     st.warning(exp.args)
+    #     st.warning(
+    #         "Please try refreshing cookies or try later if it doesn't work")
