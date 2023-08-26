@@ -1,5 +1,7 @@
 from bardapi import BardCookies
 import streamlit as st
+import pandas as pd
+# import matplotlib.pyplot as plt
 
 
 class BardAPIConsumer:
@@ -88,25 +90,69 @@ class BardAPIConsumer:
         }
         _self.bard = BardCookies(cookie_dict=cookie_dict)
 
-
     #  Function Creating CSV Data
-    def create_csv(_self, orgString, startYear, endYear):
-        res = _self.bard.get_answer('''Please generate a semicolon-separated string of values showing {orgString} ESG data in the following manner:
-                                    """year; greenhouse emissions (units); water usage (units); waste production (units)
-                                        <year1>; <int(value1)>; <int(value1)>; <int(value1)> 
-                                        <year2>; <int(value2)>; <int(value2)>; <int(value2)>
-                                        """from {startYear} to {endYear}''')
+    # @st.cache_resource()
+    def create_csv(_self, orgQuery, startYear, endYear):
+        query = '''Please generate a csv report showing {} ESG data in the following manner:
+                                    """year;greenhouse_emissions(units);water_usage(units);waste_production(units)
+                                        <year1>;<int(value1)>;<int(value1)>;<int(value1)> 
+                                        <year2>;<int(value2)>;<int(value2)>;<int(value2)>
+                                        """from {} to {}'''
+        res = _self.bard.get_answer(query.format(
+            orgQuery, startYear, endYear))['code']
+        with open("response.csv", "w+") as file:
+            file.write(res)
+            # print("CSV Response File Generated")
         return res
 
+    # @st.cache_resource()
+    def create_html(_self, orgQuery, startYear, endYear):
+        query = '''Please generate a html report showing {} ESG data in the following strictly this manner:
+                                    """year;greenhouse_emissions(units);water_usage(units);waste_production(units)
+                                        <year1>;<int(value1)>;<int(value1)>;<int(value1)> 
+                                        <year2>;<int(value2)>;<int(value2)>;<int(value2)>
+                                        """from {} to {}'''
+        res_html = _self.bard.get_answer(query.format(
+            orgQuery, startYear, endYear))['code']
+
+        with open("response.html", "w+") as file:
+            file.write(res_html)
+            # print("HTML Response File Generated")
+        return res_html
+
     # Function Creating Plot on CSV Data; Headers to be provided
-    def create_plot(_self, data):
+    def create_plot_html(_self, data):
+        # import html data to pandas and create a bar plot
+        # import pandas as pd
+        # since read_html returns a list, we convert to a DataFrame
+        df = pd.DataFrame(pd.read_html(data)[0])
+        y_axis = list()
+        for val in df.iloc[:, 1:]:
+            # y = val.replace(" ", "_")
+            y_axis.append(val)
+
+        # Plotting
+        # Fix a way to automatically get the X & Y - Axis List
+        df.plot.bar(x='Year', y=y_axis, rot=0)
+        # return plot
+        # pass
+
+    def create_plot_csv(_self, data):
         # import csv data to pandas and create a bar plot
-        import matplotlib.pyplot as plt
-        import pandas as pd
-        df = pd.DataFrame(data)
-        df.plot.bar(x='year', y=['greenhouse emissions (units)',
-                    'water usage (units)', 'waste production (units)'])
-        return df
+        # import pandas as pd
+        # import matplotlib.pyplot as plt
+        df = pd.DataFrame(pd.read_csv(data, sep=","))
+
+        # Plotting
+        y_axis = list()
+        for val in df.iloc[:, 1:]:
+            # y = val.replace(" ", "_")
+            y_axis.append(val)
+
+        # Fix a way to automatically get the X & Y - Axis List
+        df.plot.bar(x='year', y=y_axis, rot=0)
+
+        # return plot
         # pass
 
 

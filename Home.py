@@ -7,6 +7,11 @@ st.set_page_config(page_title="ESG Report Generation",
 
 st.title("ESG Report Generation")
 
+
+# Donot show warnings
+st.set_option('deprecation.showPyplotGlobalUse', False)
+
+
 # Sidebar Configuration
 st.sidebar.header("Search Parameters")
 orgString = st.sidebar.text_input("Organisation", placeholder="Example & Sons")
@@ -33,7 +38,7 @@ queryString = "Write an ESG report for the company {} based on data from {} to {
 st.header("Search Query")
 st.subheader("Your search query looks like this:")
 st.write(queryString.format(orgString, startDate.year, endDate.year))
-        # Below Here
+# Below Here
 
 
 if orgString and startDate and endDate and PSID and PSIDTS:
@@ -51,19 +56,32 @@ if orgString and startDate and endDate and PSID and PSIDTS:
         if refresh_cookie_btn:
             llm.refresh_cookies(PSID=PSID, PSIDTS=PSIDTS)
             st.toast("Cookies Refreshed")
-        
+
         # Function to read Image Value
 
         # if upload_image is not None:
         #     byte = upload_image.getvalue()
         #     # TODO: Error 1
         #     img_Byte = llm.image_desc(byte)
-        #      st.write(img_Byte) 
+        #      st.write(img_Byte)
 
-        # Write for Creating CSv data and Returing plot 
+        # Write for Creating CSv data and Returing plot
+
+        st.caption("below is csv data")
+        st.write(llm.create_csv(orgQuery=orgString,
+                 startYear=startDate.year, endYear=endDate.year))
+        st.caption("below is vizualization csv")
+        st.pyplot(llm.create_plot_csv("response.csv"))
+
+        st.caption("below is html data")
+        st.write(llm.create_html(orgQuery=orgString,
+                 startYear=startDate.year, endYear=endDate.year))
+        st.caption("below is vizualization html")
+        st.pyplot(llm.create_plot_html("response.html"))
+
 
 
     except Exception as exp:
-        st.warning(*exp.args)
+        st.warning(exp)
         st.warning(
             "Please try refreshing cookies or try later if it doesn't work")
