@@ -1,4 +1,6 @@
 import streamlit as st
+from PIL import Image
+
 
 st.set_page_config(page_title="ESG Report Generation",
                    layout="centered")
@@ -16,7 +18,10 @@ PSID = st.sidebar.text_input("Secure1_PSID Cookie", type="password")
 PSIDTS = st.sidebar.text_input("Secure1_PSIDTS Cookie", type="password")
 generate_doc = st.sidebar.button(label="Generate Document")
 # download_doc = st.sidebar.button(label = "Download Generated Document")
-refresh_cookie_btn = st.sidebar.button(label="Refresh Cookies", help="If you run into errors, try refreshing Bard and copy-paste the new cookies here")
+refresh_cookie_btn = st.sidebar.button(
+    label="Refresh Cookies", help="If you run into errors, try refreshing Bard and copy-paste the new cookies here")
+upload_image = st.sidebar.file_uploader(label="Upload Image", type=[
+    "png", "jpg"], accept_multiple_files=False)
 
 
 # Variables
@@ -28,6 +33,8 @@ queryString = "Write an ESG report for the company {} based on data from {} to {
 st.header("Search Query")
 st.subheader("Your search query looks like this:")
 st.write(queryString.format(orgString, startDate.year, endDate.year))
+        # Below Here
+
 
 if orgString and startDate and endDate and PSID and PSIDTS:
     try:
@@ -39,11 +46,24 @@ if orgString and startDate and endDate and PSID and PSIDTS:
             byteIO = llm.export_word(llm.get_report_text(
                 queryString.format(orgString, startDate.year, endDate.year)))
             if st.download_button("Download Generated Document", file_name='report.docx', data=byteIO.getvalue()):
-                    # st.download_button()
+                # st.download_button()
                 st.toast("Downloading File!")
         if refresh_cookie_btn:
             llm.refresh_cookies(PSID=PSID, PSIDTS=PSIDTS)
             st.toast("Cookies Refreshed")
+        
+        # Function to read Image Value
+
+        # if upload_image is not None:
+        #     byte = upload_image.getvalue()
+        #     # TODO: Error 1
+        #     img_Byte = llm.image_desc(byte)
+        #      st.write(img_Byte) 
+
+        # Write for Creating CSv data and Returing plot 
+
+
     except Exception as exp:
         st.warning(*exp.args)
-        st.warning("Please try refreshing cookies or try later if it doesn't work")
+        st.warning(
+            "Please try refreshing cookies or try later if it doesn't work")
