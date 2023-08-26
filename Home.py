@@ -56,8 +56,6 @@ if orgString and startDate and endDate and PSID and PSIDTS:
         if refresh_cookie_btn:
             llm.refresh_cookies(PSID=PSID, PSIDTS=PSIDTS)
             st.toast("Cookies Refreshed")
-        
-        st.write(llm.get_viz_data())
 
         # Function to read Image Value
 
