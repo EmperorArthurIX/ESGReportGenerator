@@ -1,5 +1,8 @@
 from bardapi import BardCookies
 import streamlit as st
+import pandas as pd
+# import matplotlib.pyplot as plt
+
 
 class BardAPIConsumer:
 
@@ -47,7 +50,8 @@ class BardAPIConsumer:
 
             if heading_text and content_text:
                 # Add heading
-                heading = doc.add_paragraph(heading_text, style='Heading Style')
+                heading = doc.add_paragraph(
+                    heading_text, style='Heading Style')
 
                 # Add content with bullet points
                 content_lines = content_text.split('\n')
@@ -63,7 +67,17 @@ class BardAPIConsumer:
         return bio
         # pass
 
-    def image_desc(_self):
+    def image_desc(_self, img_bio):
+        # image = open('image_path', 'rb').read()
+        # res = _self.bard.ask_about_image('Generate a python dictionary from the content of the image', image)['content']
+        # return res
+        # import io
+        # img_bio = io.BytesIO()
+        # img_bio.write(img_bio.read())
+        # img_bio.seek(0)
+        # res = _self.bard.ask_about_image(
+            # 'Generate a python dictionary from the content of the image', image)['content']
+        # return res
         pass
 
     def get_viz_data(_self):
@@ -79,11 +93,76 @@ from 2018 to 2023''')
         _self.PSID = PSID
         _self.PSIDTS = PSIDTS
         cookie_dict = {
-            "__Secure-1PSID": PSID,
+            "__Secure-1PSID": PSID, -
             "__Secure-1PSIDTS": PSIDTS,
             # Any cookie values you want to pass session object.
         }
         _self.bard = BardCookies(cookie_dict=cookie_dict)
+
+    #  Function Creating CSV Data
+    # @st.cache_resource()
+    def create_csv(_self, orgQuery, startYear, endYear):
+        query = '''Please generate a csv report showing {} ESG data in the following manner:
+                                    """year;greenhouse_emissions(units);water_usage(units);waste_production(units)
+                                        <year1>;<int(value1)>;<int(value1)>;<int(value1)> 
+                                        <year2>;<int(value2)>;<int(value2)>;<int(value2)>
+                                        """from {} to {}'''
+        res = _self.bard.get_answer(query.format(
+            orgQuery, startYear, endYear))['code']
+        with open("response.csv", "w+") as file:
+            file.write(res)
+            # print("CSV Response File Generated")
+        return res
+
+    # @st.cache_resource()
+    def create_html(_self, orgQuery, startYear, endYear):
+        query = '''Please generate a html report showing {} ESG data in the following strictly this manner:
+                                    """year;greenhouse_emissions(units);water_usage(units);waste_production(units)
+                                        <year1>;<int(value1)>;<int(value1)>;<int(value1)> 
+                                        <year2>;<int(value2)>;<int(value2)>;<int(value2)>
+                                        """from {} to {}'''
+        res_html = _self.bard.get_answer(query.format(
+            orgQuery, startYear, endYear))['code']
+
+        with open("response.html", "w+") as file:
+            file.write(res_html)
+            # print("HTML Response File Generated")
+        return res_html
+
+    # Function Creating Plot on CSV Data; Headers to be provided
+    def create_plot_html(_self, data):
+        # import html data to pandas and create a bar plot
+        # import pandas as pd
+        # since read_html returns a list, we convert to a DataFrame
+        df = pd.DataFrame(pd.read_html(data)[0])
+        y_axis = list()
+        for val in df.iloc[:, 1:]:
+            # y = val.replace(" ", "_")
+            y_axis.append(val)
+
+        # Plotting
+        # Fix a way to automatically get the X & Y - Axis List
+        df.plot.bar(x='Year', y=y_axis, rot=0)
+        # return plot
+        # pass
+
+    def create_plot_csv(_self, data):
+        # import csv data to pandas and create a bar plot
+        # import pandas as pd
+        # import matplotlib.pyplot as plt
+        df = pd.DataFrame(pd.read_csv(data, sep=","))
+
+        # Plotting
+        y_axis = list()
+        for val in df.iloc[:, 1:]:
+            # y = val.replace(" ", "_")
+            y_axis.append(val)
+
+        # Fix a way to automatically get the X & Y - Axis List
+        df.plot.bar(x='year', y=y_axis, rot=0)
+
+        # return plot
+        # pass
 
 
 if __name__ == '__main__':
