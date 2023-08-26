@@ -44,6 +44,8 @@ if orgString and startDate and endDate and PSID and PSIDTS:
         if refresh_cookie_btn:
             llm.refresh_cookies(PSID=PSID, PSIDTS=PSIDTS)
             st.toast("Cookies Refreshed")
+        
+        st.write(llm.get_viz_data())
     except Exception as exp:
         st.warning(*exp.args)
         st.warning("Please try refreshing cookies or try later if it doesn't work")
