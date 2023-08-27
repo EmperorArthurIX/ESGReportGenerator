@@ -21,9 +21,9 @@ class BardAPIConsumer:
         report = _self.bard.get_answer(queryString)['content']
         return report
 
-    def export_word(_self, reportText: str):
+    def export_word(_self, reportText: str, image):
         from docx import Document
-        from docx.shared import Pt, RGBColor
+        from docx.shared import Pt, RGBColor, Mm
         import io
         bio = io.BytesIO()
         value = reportText
@@ -61,14 +61,17 @@ class BardAPIConsumer:
                             line.strip()[2:], style='Body Style').style = 'List Bullet'
                     else:
                         doc.add_paragraph(line.strip(), style='Body Style')
-
+        heading = doc.add_paragraph(
+                    "Visualizations", style='Heading Style')
+        doc.add_picture(image,width=Mm(150))
         # Save the document
         doc.save(bio)
         return bio
         # pass
 
     def image_desc(_self, img_bio):
-        res = _self.bard.ask_about_image('Generate a python dictionary from the content of the image', img_bio)
+        res = _self.bard.ask_about_image(
+            'Generate a python dictionary from the content of the image', img_bio)['content']
         return res
 
     def refresh_cookies(_self, PSID, PSIDTS):
@@ -109,7 +112,7 @@ class BardAPIConsumer:
         with open("response.html", "w+") as file:
             file.write(res_html)
             # print("HTML Response File Generated")
-        return res_html.replace(">",">\n\n")
+        return res_html.replace("</tr>", "</tr>\n\n")
 
     # Function Creating Plot on CSV Data; Headers to be provided
     def create_plot_html(_self, data):
@@ -143,7 +146,7 @@ class BardAPIConsumer:
         # Fix a way to automatically get the X & Y - Axis List
         df.plot.bar(x='year', y=y_axis, rot=0)
 
-        # return plot
+        # return plot_csv
         # pass
 
 
