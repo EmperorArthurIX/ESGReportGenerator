@@ -74,8 +74,8 @@ if orgString and startDate and endDate and PSID and PSIDTS:
     st.caption("below is html data")
     st.write(llm.create_html(orgQuery=orgString,
              startYear=startDate.year, endYear=endDate.year))
-    st.caption("below is vizualization html")
-    st.pyplot(llm.create_plot_html("response.html"))
+    # st.caption("below is vizualization html")
+    # st.pyplot(llm.create_plot_html("response.html"))
 
     # except Exception as exp:
     #     st.warning(exp.args)
