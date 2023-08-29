@@ -64,10 +64,9 @@ if orgString and startDate and endDate and PSID and PSIDTS:
         st.toast("Cookies Refreshed")
 
     # Write for Creating CSv data and Returing plot
-
-    st.caption("below is csv data")
-    st.write(llm.create_csv(orgQuery=orgString,
-             startYear=startDate.year, endYear=endDate.year))
+    # st.caption("below is csv data")
+    # st.write(llm.create_csv(orgQuery=orgString,
+    #          startYear=startDate.year, endYear=endDate.year))
     # st.caption("below is vizualization csv")
     # st.pyplot(llm.create_plot_csv("response.csv"))
     # llm.create_plot_csv("response.csv")
