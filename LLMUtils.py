@@ -1,7 +1,7 @@
 from bardapi import BardCookies
 import streamlit as st
 import pandas as pd
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 
 class BardAPIConsumer:
@@ -21,7 +21,7 @@ class BardAPIConsumer:
         report = _self.bard.get_answer(queryString)['content']
         return report
 
-    def export_word(_self, reportText: str, image):
+    def export_word(_self, reportText: str, plots):
         from docx import Document
         from docx.shared import Pt, RGBColor, Mm
         import io
@@ -37,6 +37,14 @@ class BardAPIConsumer:
         heading_font.size = Pt(16)
         heading_style.paragraph_format.alignment = 3  # Justify alignment
         heading_font.color.rgb = RGBColor(51, 51, 51)
+
+        # Plot Styles
+        plot_style = doc.styles.add_style('Plot Style', 1)
+        plot_font = plot_style.font
+        plot_font.bold = True
+        plot_font.size = Pt(16)
+        plot_font.color.rgb = RGBColor(51, 51, 51)
+        plot_style.paragraph_format.alignment = 1
 
         # 1 corresponds to paragraph style
         body_style = doc.styles.add_style('Body Style', 1)
@@ -62,8 +70,11 @@ class BardAPIConsumer:
                     else:
                         doc.add_paragraph(line.strip(), style='Body Style')
         heading = doc.add_paragraph(
-                    "Visualizations", style='Heading Style')
-        doc.add_picture(image,width=Mm(150))
+            "Visualizations", style='Heading Style')
+        for i in range(len(plots)):
+            doc.add_paragraph("Plot {}".format(i+1), style='Plot Style')
+            doc.add_picture(
+                "./plots/html_plot{}.png".format(i+1), height=Mm(100))
         # Save the document
         doc.save(bio)
         return bio
@@ -78,8 +89,8 @@ class BardAPIConsumer:
         _self.PSID = PSID
         _self.PSIDTS = PSIDTS
         cookie_dict = {
-            "__Secure-1PSID": PSID, -
-            "__Secure-1PSIDTS": PSIDTS,
+            "__Secure-1PSID": PSID,
+            "__Secure-1PSIDTS": PSIDTS
             # Any cookie values you want to pass session object.
         }
         _self.bard = BardCookies(cookie_dict=cookie_dict)
@@ -99,7 +110,7 @@ class BardAPIConsumer:
             # print("CSV Response File Generated")
         return res.replace("\n", "\n\n")
 
-    # @st.cache_resource()
+    @st.cache_resource()
     def create_html(_self, orgQuery, startYear, endYear):
         query = '''Please generate a html report showing {} ESG data in the following strictly this manner:
                                     """year,greenhouse_emissions(tonnes),water_usage(litres),waste_production(tonnes)
@@ -114,40 +125,36 @@ class BardAPIConsumer:
             # print("HTML Response File Generated")
         return res_html.replace("</tr>", "</tr>\n\n")
 
-    # Function Creating Plot on CSV Data; Headers to be provided
+
+    # Function Creating Plot on HTML Data; Headers to be provided
     def create_plot_html(_self, data):
         # import html data to pandas and create a bar plot
-        # import pandas as pd
-        # since read_html returns a list, we convert to a DataFrame\
+        # since read_html returns a list, we convert to a DataFrame
         df = pd.DataFrame(pd.read_html(data)[0])
-        y_axis = list()
-        for val in df.iloc[:, 1:]:
-            # y = val.replace(" ", "_")
-            y_axis.append(val)
 
         # Plotting
-        # Fix a way to automatically get the X & Y - Axis List
-        df.plot.bar(x='Year', y=y_axis, rot=0)
-        # return plot
-        # pass
+        plots = list()
+        for i, cols in enumerate(df.columns[1:]):
+            # print(cols)
+            plots.append(df.plot.bar(x='Year', y=cols, rot=0))
+            plt.savefig("./plots/html_plot{}.png".format(i+1), format='png')
+        # print(plots)
+        return plots
 
+    
+    # Function Creating Plot on CSV Data; Headers to be provided
     def create_plot_csv(_self, data):
         # import csv data to pandas and create a bar plot
-        # import pandas as pd
-        # import matplotlib.pyplot as plt
         df = pd.DataFrame(pd.read_csv(data, sep=","))
 
         # Plotting
-        y_axis = list()
-        for val in df.iloc[:, 1:]:
-            # y = val.replace(" ", "_")
-            y_axis.append(val)
-
-        # Fix a way to automatically get the X & Y - Axis List
-        df.plot.bar(x='year', y=y_axis, rot=0)
-
-        # return plot_csv
-        # pass
+        plots = list()
+        for i, cols in enumerate(df.columns[1:]):
+            # print(cols)
+            plots.append(df.plot.bar(x='year', y=cols, rot=0))
+            plt.savefig("./plots/csv_plot{}.png".format(i+1), format='png')
+        # print(plots)
+        return plots
 
 
 if __name__ == '__main__':

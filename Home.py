@@ -52,9 +52,10 @@ if orgString and startDate and endDate and PSID and PSIDTS:
     if upload_image is not None:
         st.write(llm.image_desc(upload_image.getvalue()))
 
+    plot_csv = llm.create_plot_html("response.html")
     if generate_doc:
         byteIO = llm.export_word(llm.get_report_text(
-            queryString.format(orgString, startDate.year, endDate.year)),upload_image)
+            queryString.format(orgString, startDate.year, endDate.year)), plot_csv)
         if st.download_button("Download Generated Document", file_name='report.docx', data=byteIO.getvalue()):
             # st.download_button()
             st.toast("Downloading File!")
@@ -67,9 +68,10 @@ if orgString and startDate and endDate and PSID and PSIDTS:
     st.caption("below is csv data")
     st.write(llm.create_csv(orgQuery=orgString,
              startYear=startDate.year, endYear=endDate.year))
-    st.caption("below is vizualization csv")
-    st.pyplot(llm.create_plot_csv("response.csv"))
-             
+    # st.caption("below is vizualization csv")
+    # st.pyplot(llm.create_plot_csv("response.csv"))
+    # llm.create_plot_csv("response.csv")
+
     st.caption("below is html data")
     st.write(llm.create_html(orgQuery=orgString,
              startYear=startDate.year, endYear=endDate.year))
